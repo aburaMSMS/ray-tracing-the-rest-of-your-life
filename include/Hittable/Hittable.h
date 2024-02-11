@@ -9,6 +9,11 @@ class Material;
 class HitRecord
 {
 public:
+    void operator=(const HitRecord &hit_record);
+
+    void SetFrontFaceAndNormal(const Ray &ray, const Vector3 &outward_normal);
+
+public:
     Point3 intersection_point;
     Vector3 normal;
     double t = 0.;
@@ -16,8 +21,6 @@ public:
     double u = 0.;
     double v = 0.;
     bool front_face = true;
-
-    void SetFrontFaceAndNormal(const Ray &ray, const Vector3 &outward_normal);
 };
 
 class Hittable
