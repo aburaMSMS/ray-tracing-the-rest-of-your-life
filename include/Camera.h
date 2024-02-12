@@ -16,9 +16,9 @@ public:
 private:
     void Initialize();
 
-    Ray GetRay(int i, int j) const;
+    Ray GetRay(int i, int j, int sample_i, int sample_j) const;
 
-    Vector3 SampleRandomOffset() const;
+    Vector3 PixelSampleSquare(int sample_i, int sample_j) const;
 
     Point3 DefocusDiskSample() const;
 
@@ -45,6 +45,9 @@ private:
     Vector3 pixel_delta_v;
     Point3 pixel00_loc;
     Point3 camera_center;
+
+    int sqrt_samples_per_pixel = static_cast<int>(std::sqrt(samples_per_pixel));
+    double recip_sqrt_samples_per_pixel = 1. / std::sqrt(samples_per_pixel);
 
     Vector3 u, v, w;
 

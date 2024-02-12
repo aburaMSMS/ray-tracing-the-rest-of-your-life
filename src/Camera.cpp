@@ -15,12 +15,15 @@ void Camera::Render(const HittableList &world)
         std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
         for (int i = 0; i < image_width; ++i)
         {
-            Color pixel_color(0., 0., 0.);
+            Color pixel_color{0.};
 
-            for (int sample = 0; sample < samples_per_pixel; sample++)
+            for (int sample_j = 0; sample_j < sqrt_samples_per_pixel; sample_j++)
             {
-                auto sample_ray = GetRay(i, j);
-                pixel_color += RayColor(sample_ray, max_depth, world);
+                for (int sample_i = 0; sample_i < sqrt_samples_per_pixel; sample_i++)
+                {
+                    auto sample_ray = GetRay(i, j, sample_i, sample_j);
+                    pixel_color += RayColor(sample_ray, max_depth, world);
+                }
             }
 
             WriteColor(std::cout, pixel_color, 1. / samples_per_pixel);
@@ -39,6 +42,9 @@ void Camera::Initialize()
 {
     image_height = static_cast<int>(image_width / aspect_ratio);
     image_height = (image_height < 1) ? 1 : image_height;
+
+    sqrt_samples_per_pixel = static_cast<int>(std::sqrt(samples_per_pixel));
+    recip_sqrt_samples_per_pixel = 1. / std::sqrt(samples_per_pixel);
 
     camera_center = look_from;
 
@@ -68,10 +74,10 @@ void Camera::Initialize()
     defocus_disk_v = v * defocus_radius;
 }
 
-Ray Camera::GetRay(int i, int j) const
+Ray Camera::GetRay(int i, int j, int sample_i, int sample_j) const
 {
     auto pixel_center = pixel00_loc + i * pixel_delta_u + j * pixel_delta_v;
-    auto pixel_sample = pixel_center + SampleRandomOffset();
+    auto pixel_sample = pixel_center + PixelSampleSquare(sample_i, sample_j);
 
     Point3 ray_origin = defocus_angle <= 0. ? camera_center : DefocusDiskSample();
     auto time = RandomDouble();
@@ -79,10 +85,12 @@ Ray Camera::GetRay(int i, int j) const
     return Ray(ray_origin, pixel_sample - ray_origin, time);
 }
 
-Vector3 Camera::SampleRandomOffset() const
+Vector3 Camera::PixelSampleSquare(int sample_i, int sample_j) const
 {
-    auto px = -0.5 + RandomDouble();
-    auto py = -0.5 + RandomDouble();
+    auto px = -0.5 +
+              recip_sqrt_samples_per_pixel * (sample_i + RandomDouble());
+    auto py = -0.5 +
+              recip_sqrt_samples_per_pixel * (sample_j + RandomDouble());
 
     return px * pixel_delta_u + py * pixel_delta_v;
 }
