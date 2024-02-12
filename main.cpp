@@ -1,6 +1,3 @@
-#if 1
-
-#include <iostream>
 #include "global.h"
 #include "Camera.h"
 #include "HittableList.h"
@@ -24,8 +21,6 @@ int main()
         Point3{555., 0., 0.}, Vector3{0., 555., 0.}, Vector3{0., 0., 555.}, green));
     world.Add(std::make_shared<Quadrilateral>(
         Point3{0., 0., 0.}, Vector3{0., 555., 0.}, Vector3{0., 0., 555.}, red));
-    // world.Add(std::make_shared<Quadrilateral>(
-    //     Point3{343., 554., 332.}, Vector3{-130., 0., 0.}, Vector3{0., 0., -105.}, light));
     world.Add(std::make_shared<Disk>(Point3{278., 554., 278.}, 100., light));
     world.Add(std::make_shared<Quadrilateral>(
         Point3{0., 0., 0.}, Vector3{555., 0., 0.}, Vector3{0., 0., 555.}, white));
@@ -36,12 +31,18 @@ int main()
 
     std::shared_ptr<Hittable> cylinder = std::make_shared<Cylinder>(Point3{0.}, 150., 300., white);
 
-    std::shared_ptr<Hittable> transparent = std::make_shared<Cylinder>(Point3{0.}, 80., 300., white);
-    transparent = std::make_shared<Rotate>(transparent, 90, 0);
-    transparent = std::make_shared<Translate>(transparent, Vector3{100., 150., -150.});
+    std::shared_ptr<Hittable> transparent1 = std::make_shared<Cylinder>(Point3{0.}, 80., 300., white);
+    transparent1 = std::make_shared<Rotate>(transparent1, 90, 0);
+    transparent1 = std::make_shared<Translate>(transparent1, Vector3{100., 150., -150.});
+
+    std::shared_ptr<Hittable> transparent2 = std::make_shared<Cylinder>(Point3{0., -1., 0.}, 80., 302., white);
+
+    std::shared_ptr<Hittable> transparent3 = std::make_shared<Cuboid>(Point3{70., -1., -40.}, Point3{200., 301., 40.}, white);
+
+    std::vector transparent{transparent1, transparent2, transparent3};
     cylinder = std::make_shared<Subtract>(cylinder, transparent);
 
-    cylinder = std::make_shared<Rotate>(cylinder, 60., 1);
+    cylinder = std::make_shared<Rotate>(cylinder, 70., 1);
     cylinder = std::make_shared<Rotate>(cylinder, 30., 0);
     cylinder = std::make_shared<Translate>(cylinder, Vector3{278., 150. * std::sin(Deg2Rad(30.)), 200.});
     world.Add(cylinder);
@@ -51,7 +52,7 @@ int main()
     Camera camera;
     camera.aspect_ratio = 1.0;
     camera.image_width = 800;
-    camera.samples_per_pixel = 500;
+    camera.samples_per_pixel = 600;
     camera.max_depth = 50;
     camera.background = Color{0.};
 
@@ -64,5 +65,3 @@ int main()
 
     camera.Render(world);
 }
-
-#endif // 1

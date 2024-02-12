@@ -10,10 +10,9 @@
 class HittableList : public Hittable
 {
 public:
-    std::vector<std::shared_ptr<Hittable>> objects;
-
     HittableList() {}
     HittableList(const std::shared_ptr<Hittable> object);
+    HittableList(const std::vector<std::shared_ptr<Hittable>> &_objects);
 
     void Clear();
 
@@ -22,4 +21,7 @@ public:
     size_t Size() const;
 
     bool IsHit(const Ray &ray, Interval t_range, HitRecord &hit_record) const override;
+
+public:
+    std::vector<std::shared_ptr<Hittable>> objects;
 };

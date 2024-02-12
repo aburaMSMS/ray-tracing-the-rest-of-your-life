@@ -5,6 +5,11 @@ HittableList::HittableList(const std::shared_ptr<Hittable> object)
     Add(object);
 }
 
+HittableList::HittableList(const std::vector<std::shared_ptr<Hittable>> &_objects)
+{
+    objects = _objects;
+}
+
 void HittableList::Clear()
 {
     objects.clear();
