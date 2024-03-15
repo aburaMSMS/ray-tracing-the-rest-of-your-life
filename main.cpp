@@ -27,13 +27,23 @@ int main()
     world.Add(std::make_shared<Quadrilateral>(
         Point3{0., 0., 555.}, Vector3{555., 0., 0.}, Vector3{0., 555., 0.}, white));
 
-    std::shared_ptr<Hittable> box1 =
-        std::make_shared<Cuboid>(Point3{0.}, Point3{165., 165., 165.}, white);
-    box1 = std::make_shared<Rotate>(box1, -18., 1);
-    box1 = std::make_shared<Translate>(box1, Vector3{130., 0., 65.});
+    std::shared_ptr<HittableList> triangular_prism = std::make_shared<HittableList>();
+    triangular_prism->Add(std::make_shared<Triangle>(Point3{0.}, Point3{165., 0., 0.}, Point3{0., 0., 165.}, white));
+    triangular_prism->Add(std::make_shared<Triangle>(Point3{0.}, Point3{0., 0., 165.}, Point3{0., 165., 165.}, white));
+    triangular_prism->Add(std::make_shared<Triangle>(Point3{0.}, Point3{0., 165., 0.}, Point3{0., 165., 165.}, white));
+    triangular_prism->Add(std::make_shared<Triangle>(Point3{0.}, Point3{165., 165., 0.}, Point3{165., 0., 0.}, white));
+    triangular_prism->Add(std::make_shared<Triangle>(Point3{0.}, Point3{165., 165., 0.}, Point3{0., 165., 0.}, white));
+    triangular_prism->Add(std::make_shared<Triangle>(Point3{165., 0., 0.}, Point3{165., 165., 0.}, Point3{0., 165., 165.}, white));
+    triangular_prism->Add(std::make_shared<Triangle>(Point3{165., 0., 0.}, Point3{0., 0., 165.}, Point3{0., 165., 165.}, white));
+    triangular_prism->Add(std::make_shared<Triangle>(Point3{0., 165., 0.}, Point3{165., 165., 0.}, Point3{0., 165., 165.}, white));
+
+    std::shared_ptr<Hittable> box1 = std::make_shared<BVH>(*triangular_prism);
+    box1 = std::make_shared<Rotate>(box1, 108., 1);
+    box1 = std::make_shared<Translate>(box1, Vector3{120., 0., 200.});
     world.Add(box1);
 
     std::shared_ptr<Hittable> box2 = std::make_shared<Cuboid>(Point3{0.}, Point3{165., 330., 165.}, white);
+
     box2 = std::make_shared<Rotate>(box2, 15., 1);
     box2 = std::make_shared<Translate>(box2, Vector3{265., 0., 295.});
     world.Add(box2);
@@ -43,7 +53,7 @@ int main()
     Camera camera;
     camera.aspect_ratio = 1.0;
     camera.image_width = 800;
-    camera.samples_per_pixel = 256;
+    camera.samples_per_pixel = 400;
     camera.max_depth = 50;
     camera.background = Color{0.};
 

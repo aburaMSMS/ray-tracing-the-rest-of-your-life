@@ -7,3 +7,5 @@ redirect.txt
 output/*.ppm
 
 external
+
+models

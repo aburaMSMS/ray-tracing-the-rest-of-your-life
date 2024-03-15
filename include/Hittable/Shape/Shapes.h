@@ -6,3 +6,4 @@
 #include "Cuboid.h"
 #include "Disk.h"
 #include "Cylinder.h"
+#include "Triangle.h"
