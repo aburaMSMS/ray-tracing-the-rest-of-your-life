@@ -13,8 +13,10 @@ public:
 
     bool IsHit(const Ray &ray, Interval t_range, HitRecord &hit_record) const;
 
+    const Vector3 &Normal() const;
+
 private:
-    const Point3 &vertex1;
+    Point3 vertex1;
     Vector3 u, v;
     std::shared_ptr<Material> material;
     Vector3 normal;

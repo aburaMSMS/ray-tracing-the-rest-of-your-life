@@ -7,3 +7,4 @@
 #include "Disk.h"
 #include "Cylinder.h"
 #include "Triangle.h"
+#include "Model.h"

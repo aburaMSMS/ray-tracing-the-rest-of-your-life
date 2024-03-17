@@ -47,3 +47,8 @@ bool Triangle::IsHit(const Ray &ray, Interval t_range, HitRecord &hit_record) co
 
     return true;
 }
+
+const Vector3 &Triangle::Normal() const
+{
+    return normal;
+}

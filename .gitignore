@@ -8,4 +8,7 @@ output/*.ppm
 
 external
 
-models
+models/*
+!models/bunny.obj
+
+

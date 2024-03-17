@@ -21,7 +21,7 @@ bool Scale::IsHit(const Ray &ray, Interval t_range, HitRecord &hit_record) const
     }
 
     hit_record.intersection_point = hit_record.intersection_point * scale_rate;
-    hit_record.normal = hit_record.normal * reverse_scale_rate;
+    hit_record.normal = UnitVector(hit_record.normal * reverse_scale_rate);
 
     return true;
 }

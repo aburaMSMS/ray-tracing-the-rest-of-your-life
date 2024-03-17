@@ -2,3 +2,4 @@ image, rendering time (s), size (pixel * pixel), samples per pixel, depth
 0.ppm, 542, 800*, 256, 50
 subtract.ppm, 1706, 800*, 600, 50
 2.ppm, 566, 800*, 256, 50
+bunny.ppm,10446,400*363,400,50
