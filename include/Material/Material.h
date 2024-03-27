@@ -3,6 +3,7 @@
 #include "Color.h"
 #include "Ray.h"
 #include "Texture.h"
+#include "ONB.h"
 
 class HitRecord;
 
@@ -12,10 +13,11 @@ class Material
 public:
     virtual ~Material() = default;
 
-    virtual Color Emit(double u, double v, const Point3 &point) const;
+    virtual Color Emit(const HitRecord &hit_record, double u, double v, const Point3 &point) const;
 
-    virtual bool Scatter(const Ray &incident_ray, const HitRecord &hit_record,
-                         Color &attenuation, Ray &scattered_ray) const = 0;
+    virtual bool Scatter(const Ray &incident_ray, const HitRecord &hit_record, Color &attenuation, Ray &scattered_ray) const = 0;
+
+    virtual double ScatteringPdf(const Ray &incidente_ray, const HitRecord &hit_record, const Ray &scattered_ray) const;
 };
 
 /* Lambertian */
@@ -26,8 +28,9 @@ public:
 
     Lambertian(const std::shared_ptr<Texture> texture) : albedo(texture) {}
 
-    bool Scatter(const Ray &incident_ray, const HitRecord &hit_record,
-                 Color &attenuation, Ray &scattered_ray) const override;
+    bool Scatter(const Ray &incident_ray, const HitRecord &hit_record, Color &attenuation, Ray &scattered_ray) const override;
+
+    double ScatteringPdf(const Ray &incidente_ray, const HitRecord &hit_record, const Ray &scattered_ray) const override;
 
 private:
     std::shared_ptr<Texture> albedo;
@@ -39,8 +42,7 @@ class OrenNayarDiffuse : public Material
 public:
     OrenNayarDiffuse(double _rou_d) : rou_d(_rou_d) {}
 
-    bool Scatter(const Ray &incident_ray, const HitRecord &hit_record,
-                 Color &attenuation, Ray &scattered_ray) const override;
+    bool Scatter(const Ray &incident_ray, const HitRecord &hit_record, Color &attenuation, Ray &scattered_ray) const override;
 
 private:
     double rou_d;
@@ -84,7 +86,7 @@ public:
     DiffuseLight(std::shared_ptr<Texture> _light_texture) : light_texture(_light_texture) {}
     DiffuseLight(const Color &color) : light_texture(std::make_shared<SolidColor>(color)) {}
 
-    Color Emit(double u, double v, const Point3 &point) const;
+    Color Emit(const HitRecord &hit_record, double u, double v, const Point3 &point) const;
 
     bool Scatter(const Ray &incident_ray, const HitRecord &hit_record,
                  Color &attenuation, Ray &scattered_ray) const override;

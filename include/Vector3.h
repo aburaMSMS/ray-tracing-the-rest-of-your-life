@@ -67,7 +67,7 @@ public:
     }
 };
 
-// point3 is just an alias for vec3, but useful for geometric clarity in the code.
+// point3 is just an alias for Vector3, but useful for geometric clarity in the code.
 using Point3 = Vector3;
 
 // Vector Utility Functions
@@ -174,4 +174,17 @@ inline Vector3 RandomPoint3InUnitDisk()
 inline Vector3 Reflect(const Vector3 &incident_direction, const Vector3 &normal)
 {
     return incident_direction - 2 * Dot(incident_direction, normal) * normal;
+}
+
+inline Vector3 RandomCosineDirection()
+{
+    auto r1 = RandomDouble();
+    auto r2 = RandomDouble();
+
+    auto phi = 2 * PI * r1;
+    auto x = std::cos(phi) * std::sqrt(r2);
+    auto y = std::sin(phi) * std::sqrt(r2);
+    auto z = std::sqrt(1 - r2);
+
+    return Vector3{x, y, z};
 }

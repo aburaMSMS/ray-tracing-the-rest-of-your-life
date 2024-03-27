@@ -103,28 +103,49 @@ Point3 Camera::DefocusDiskSample() const
 
 Color Camera::RayColor(const Ray &ray, int depth, const Hittable &world) const
 {
-    HitRecord record;
+    HitRecord hit_record;
 
     if (depth <= 0)
     {
         return Color(0.);
     }
 
-    if (!world.IsHit(ray, Interval(0.0001, _INFINITY), record))
+    if (!world.IsHit(ray, Interval(0.0001, _INFINITY), hit_record))
     {
         return background;
     }
 
     Ray scattered_ray;
     Color attenuation(1.);
-    auto color_from_emission = record.material->Emit(record.u, record.v, record.intersection_point);
+    auto color_from_emission = hit_record.material->Emit(hit_record, hit_record.u, hit_record.v, hit_record.intersection_point);
 
-    if (!record.material->Scatter(ray, record, attenuation, scattered_ray))
+    if (!hit_record.material->Scatter(ray, hit_record, attenuation, scattered_ray))
     {
         return color_from_emission;
     }
 
-    auto color_from_scatter = attenuation * RayColor(scattered_ray, depth - 1, world);
+    auto on_light = Point3{RandomDouble(213., 343.), 554.9, RandomDouble(227., 332.)};
+    auto to_light = on_light - hit_record.intersection_point;
+    auto distance_squared = to_light.LengthSquared();
+    to_light = UnitVector(to_light);
+
+    if (Dot(to_light, hit_record.normal) < 0)
+    {
+        return color_from_emission;
+    }
+    double light_area = (343. - 213.) * (332. - 227.);
+    auto light_cosine = std::fabs(to_light.Y());
+    if (light_cosine < 0.000001)
+    {
+        return color_from_emission;
+    }
+
+    auto pdf = distance_squared / (light_cosine * light_area);
+    scattered_ray = Ray{hit_record.intersection_point, to_light, ray.Time()};
+
+    auto scattering_pdf = hit_record.material->ScatteringPdf(ray, hit_record, scattered_ray);
+
+    auto color_from_scatter = (attenuation * scattering_pdf * RayColor(scattered_ray, depth - 1, world)) / pdf;
 
     return color_from_emission + color_from_scatter;
 }

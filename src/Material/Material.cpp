@@ -2,24 +2,33 @@
 
 #include "Hittable.h"
 
-Color Material::Emit(double u, double v, const Point3 &point) const
+Color Material::Emit(const HitRecord &hit_record, double u, double v, const Point3 &point) const
 {
     return Color{0.};
+}
+
+double Material::ScatteringPdf(const Ray &incidente_ray, const HitRecord &hit_record, const Ray &scattered_ray) const
+{
+    return 0;
 }
 
 bool Lambertian::Scatter(const Ray &incident_ray, const HitRecord &hit_record,
                          Color &attenuation, Ray &scattered_ray) const
 {
-    auto scatter_direction = hit_record.normal + RandomUnitVector3();
-
-    if (scatter_direction.IsNearZero())
-    {
-        scatter_direction = hit_record.normal;
-    }
+    ONB uvw;
+    uvw.BuildFromW(hit_record.normal);
+    auto scatter_direction = uvw.Local(RandomCosineDirection());
 
     attenuation = albedo->Value(hit_record.u, hit_record.v, hit_record.intersection_point);
     scattered_ray = Ray(hit_record.intersection_point, scatter_direction, incident_ray.Time());
     return true;
+}
+
+double Lambertian::ScatteringPdf(const Ray &incidente_ray, const HitRecord &hit_record, const Ray &scattered_ray) const
+{
+    auto cos_theta = Dot(hit_record.normal, UnitVector(scattered_ray.Direction()));
+
+    return cos_theta < 0. ? 0. : cos_theta / PI;
 }
 
 bool OrenNayarDiffuse::Scatter(const Ray &incident_ray, const HitRecord &hit_record,
@@ -85,8 +94,12 @@ double Dielectric::FresnelInSchlick(double cos_theta, double incident_eta_over_t
                     ((1 - cos_theta) * (1 - cos_theta)); // F��
 }
 
-Color DiffuseLight::Emit(double u, double v, const Point3 &point) const
+Color DiffuseLight::Emit(const HitRecord &hit_record, double u, double v, const Point3 &point) const
 {
+    if (!hit_record.front_face)
+    {
+        return Color{0.};
+    }
     return light_texture->Value(u, v, point);
 }
 
